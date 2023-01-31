@@ -19,5 +19,4 @@ int main(int argc,char ** argv){
     }
     printf("I am proc %d and sum = %d \n",my_rank,my_sum);
     MPI_Finalize();
-
 }

@@ -1,6 +1,6 @@
 #include <mpi.h>
 #include <stdio.h>
-#define FIXED_N 4
+#define FIXED_N 5
 
 int main(int argc,char ** argv){
     int my_rank,num_of_process;

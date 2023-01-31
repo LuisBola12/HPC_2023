@@ -13,6 +13,8 @@ int main(int argc,char ** argv){
     MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
     
     int matrix[FIXED_N][FIXED_N];
+    int matrix2[FIXED_N][FIXED_N];
+
     
     for(int i = 0;i<FIXED_N;i++){
         for(int j =0;j<FIXED_N;j++){
@@ -69,30 +71,37 @@ int main(int argc,char ** argv){
         matrix[my_work[i]][my_work[i]] = my_rank;
     }
     if(my_rank ==0){
-        int current_index_j = 0;
         for(int i = 1; i < num_of_process; i++){
-            for(int j = 0; j < FIXED_N;j++){
-                if(work[j]==i){
-                    n_work++;
+            MPI_Recv(matrix2,FIXED_N*FIXED_N,MPI_INT,1,10,MPI_COMM_WORLD,&status);
+            int partner_work = 0;
+            for(int k = 0; k < FIXED_N;k++){
+                if(work[k]==i){
+                    partner_work++;
                 }
             }
-            for(int j = 0; j<n_work;j++){
-                MPI_Recv(&matrix[current_index_j],FIXED_N,MPI_INT,i,10,MPI_COMM_WORLD,&status);
-                current_index_j++;
+            int partner[partner_work];
+            int current_index = 0;
+            for(int k = 0; k < FIXED_N;k++){
+                if(work[k]==i){
+                    partner[current_index] = k;
+                    current_index++;
+                }
             }
-
+            for(int k = 0;k < partner_work; k++){
+                matrix[partner[k]][partner[k]] = matrix2[partner[k]][partner[k]];
+            }
         }
     }else{
-        for(int i = 0; i < n_work;i++){
-            int actual_row = my_work[i];
-            MPI_Send(matrix[actual_row],FIXED_N,MPI_INT,0,10,MPI_COMM_WORLD);
-        }
+        MPI_Send(matrix,FIXED_N*FIXED_N,MPI_INT,0,10,MPI_COMM_WORLD);
+        // MPI_Recv(&confirmation,1,MPI_INT,0,10,MPI_COMM_WORLD,&status);
     }
-    for(int i = 0;i<FIXED_N;i++){
+    if(my_rank==0){
+        for(int i = 0;i<FIXED_N;i++){
         for(int j =0;j<FIXED_N;j++){
             printf("%d ", matrix[i][j]);
     }
         printf("\n");
     }    
+    }
     MPI_Finalize();
 }

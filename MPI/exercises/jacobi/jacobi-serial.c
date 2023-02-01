@@ -101,21 +101,24 @@ void initialise(double ** grid, double ** grid_new, int local_nx) {
 	clock_t start, end;
 	double elapsed;
 	start = clock();
-	#pragma omp parallel for 
+	#pragma omp parallel  
+	{
+		#pragma omp task
     for (j=0;j<=local_nx+1;j++) {
         grid_new[j][0]=grid[j][0]=LEFT;
     }
-	#pragma omp parallel for 
+	#pragma omp task
     for (j=0;j<=local_nx+1;j++) {
     	grid_new[j][ny2-1]=grid[j][ny2-1]=RIGHT;
     }
-	#pragma omp parallel for 
+	#pragma omp task
 	for (j=0;j<=ny+1;j++) {
 		grid_new[0][j]=grid[0][j]=TOP;
 	}
-	#pragma omp parallel for 
+	#pragma omp task 
 	for (j=0;j<=ny+1;j++) {
 		grid_new[local_nx+1][j]=grid[local_nx+1][j]=BOTTOM;		
+	}
 	}
 	#pragma omp parallel for collapse(2)
 	for (i=1;i<=local_nx;i++) {

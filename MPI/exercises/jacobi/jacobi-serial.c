@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
 
 // Boundary values 
 #define TOP 1.0
@@ -97,6 +98,9 @@ int main(int argc, char * argv[]) {
  */
 void initialise(double ** grid, double ** grid_new, int local_nx) {
 	int i, j;
+	clock_t start, end;
+	double elapsed;
+	start = clock();
 	#pragma omp parallel for 
     for (j=0;j<=local_nx+1;j++) {
         grid_new[j][0]=grid[j][0]=LEFT;
@@ -118,7 +122,10 @@ void initialise(double ** grid, double ** grid_new, int local_nx) {
 		for (j=1;j<ny+1;j++) {
 			grid_new[i][j]=grid[i][j]=0;
 		}
-	}	
+	}
+	end = clock();
+	elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
+  	printf("Time elapsed: %f\n", elapsed);
 }
 
 
